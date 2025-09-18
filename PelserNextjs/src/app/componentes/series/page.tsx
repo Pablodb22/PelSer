@@ -1,4 +1,4 @@
-export default function PeliculasPage() {
+export default function SeriesPage() {
   const categorias = [
     "Todas",
     "Acción",
