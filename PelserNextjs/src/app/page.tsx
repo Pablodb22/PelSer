@@ -28,6 +28,7 @@ const [series, setSeries] = useState<ISerie[] | null>(null);
       console.log('Películas cargadas:', portadaPelicula);
       setPortada(portadaPelicula);
       setPeliculas(todas);
+      console.log('Películas cargadas:', todas);
     }
 
     async function cargarSeries() {
@@ -370,7 +371,7 @@ const [series, setSeries] = useState<ISerie[] | null>(null);
                   >
                     {peliculas
                       ? peliculas
-                       .filter(movie => movie.genre_ids.includes(35))
+                       .filter(movie => movie.genre_ids?.includes(35))
                        .slice(0, 6)
                        .map((movie, index) => (
                           <div
@@ -536,7 +537,7 @@ const [series, setSeries] = useState<ISerie[] | null>(null);
                   >
                     {peliculas
                       ? peliculas
-                       .filter(movie => movie.genre_ids.includes(878))
+                       .filter(movie => movie.genre_ids?.includes(878))
                        .slice(0, 6)
                        .map((movie, index) => (
                           <div

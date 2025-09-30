@@ -1,15 +1,43 @@
+'use client';
+
+import { useEffect, useState } from "react";
+import * as restServicePagina from '../../servicios/pagina';
+import { ICategoria } from '../../interfaces/ICategorias';
+import { IPelicula } from "@/app/interfaces/IPeliculas";
+import Skeleton from "@mui/material/Skeleton";
+import Box from "@mui/material/Box";
+
 export default function PeliculasPage() {
-  const categorias = [
-    "Todas",
-    "Acción",
-    "Comedia",
-    "Drama",
-    "Ciencia Ficción",
-    "Terror",
-    "Romance",
-    "Aventura",
-    "Animación",
-  ];
+  const [categorias, setCategorias] = useState<ICategoria[]>([]); 
+  const [peliculas, setPeliculas] = useState<IPelicula[]>([]);
+  const [visibleCount, setVisibleCount] = useState(16); 
+  const [query, setQuery] = useState(""); 
+  const [loading, setLoading] = useState(true); 
+
+  useEffect(() => {
+    async function recuperarCategorias() {
+      const respuesta = await restServicePagina.obtenerCategorias();      
+      setCategorias(respuesta.genres);
+    }
+
+    async function cargarPeliculas() {
+      setLoading(true);
+      const paginas = [1, 2, 3, 4, 5, 6, 7, 8];      
+      const respuestas = await Promise.all(
+        paginas.map(num => restServicePagina.obtenerPeliculasPrincipal(num))
+      );
+      const todas = respuestas.flatMap(r => r.results);                                       
+      setPeliculas(todas);
+      setLoading(false); 
+    }
+
+    recuperarCategorias();
+    cargarPeliculas();
+  },[]);
+  
+  const peliculasFiltradas = peliculas.filter((pelicula) =>
+    pelicula.title.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <div
@@ -21,6 +49,7 @@ export default function PeliculasPage() {
       }}
     >
       <div className="container py-5">
+      
         {/* Buscador */}
         <div className="row mb-5 justify-content-center">
           <div className="col-lg-8 col-md-10">
@@ -30,83 +59,119 @@ export default function PeliculasPage() {
               </span>
               <input
                 type="text"
-                className="form-control bg-dark text-white border-0"               
+                className="form-control bg-dark text-white border-0"
+                placeholder="Buscar película..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)} 
               />
             </div>
           </div>
         </div>
-
+       
         {/* Categorías */}
         <div className="row mb-5">
           <div className="col-12 text-center">
             <div className="d-flex flex-wrap justify-content-center gap-2">
-              {categorias.map((cat, i) => (
+              {categorias.map((cat) => (
                 <button
-                  key={i}
-                  className={`btn ${
-                    i === 0 ? "btn-danger shadow" : "btn-outline-light"
-                  } rounded-pill px-4 py-2 transition`}
+                  key={cat.id}
+                  className="btn btn-outline-light rounded-pill px-4 py-2 transition"
                 >
-                  {cat}
+                  {cat.name}
                 </button>
               ))}
             </div>
           </div>
         </div>
-
-        {/* Películas */}
+        
+        {/* Películas o Skeletons */}
         <div className="row g-4">
-          <div className="col-lg-3 col-md-4 col-sm-6">
-            <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 movie-card">
-              <div className="position-relative">
-                <img
-                  src="https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg"
-                  className="card-img-top"
-                  alt="Oppenheimer"
-                  style={{ height: "320px", objectFit: "cover" }}
-                />
-                <div className="card-img-overlay d-flex align-items-center justify-content-center p-0 opacity-0 hover-overlay">
-                  <button className="btn btn-light rounded-circle shadow d-flex align-items-center justify-content-center">
-                    <i className="bi bi-play-fill fs-3 text-dark"></i>
-                  </button>
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="col-lg-3 col-md-4 col-sm-6">
+                  <Box className="card bg-dark border-0 rounded-4 shadow-lg overflow-hidden h-100">
+                    <Skeleton
+                      variant="rectangular"
+                      height={320}
+                      animation="wave"
+                    />
+                    <Box className="p-4">
+                      <Skeleton
+                        variant="text"
+                        width="80%"
+                        height={28}
+                        animation="wave"
+                      />
+                      <Skeleton
+                        variant="text"
+                        width="60%"
+                        height={20}
+                        animation="wave"
+                      />
+                    </Box>
+                  </Box>
                 </div>
-                <div
-                  className="position-absolute bottom-0 start-0 w-100"
-                  style={{
-                    height: "50%",
-                    background: "linear-gradient(transparent, rgba(0,0,0,0.85))",
-                  }}
-                ></div>
-              </div>
-              <div className="card-body p-4">
-                <h5 className="card-title fw-bold mb-3">Oppenheimer</h5>
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                  <small className="text-light opacity-75">
-                    <i className="bi bi-calendar3 me-2"></i>2023
-                  </small>
-                  <span className="fw-bold text-warning">
-                    <i className="bi bi-star-fill me-1"></i>8.4
-                  </span>
+              ))
+            : peliculasFiltradas.slice(0, visibleCount).map((movie) => (
+                <div className="col-lg-3 col-md-4 col-sm-6">
+                  <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 movie-card">
+                    <div className="position-relative">
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                        className="card-img-top"
+                        alt={movie.title}
+                        style={{ height: "320px", objectFit: "cover" }}
+                      />
+                      <div className="card-img-overlay d-flex align-items-center justify-content-center p-0 opacity-0 hover-overlay">
+                        <button className="btn btn-light rounded-circle shadow d-flex align-items-center justify-content-center">
+                          <i className="bi bi-play-fill fs-3 text-dark"></i>
+                        </button>
+                      </div>
+                      <div
+                        className="position-absolute bottom-0 start-0 w-100"
+                        style={{
+                          height: "50%",
+                          background: "linear-gradient(transparent, rgba(0,0,0,0.85))",
+                        }}
+                      ></div>
+                    </div>
+                    <div className="card-body p-4">
+                      <h5 className="card-title fw-bold mb-3">{movie.title}</h5>
+                      <div className="d-flex align-items-center justify-content-between mb-3">
+                        <small className="text-light opacity-75">
+                          <i className="bi bi-calendar3 me-2"></i>
+                          {movie.release_date}
+                        </small>
+                        <span className="fw-bold text-warning">
+                          <i className="bi bi-star-fill me-1"></i>
+                          {movie.vote_average}
+                        </span>
+                      </div>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
+                          <i className="bi bi-plus-lg me-1"></i>Lista
+                        </button>
+                        <button className="btn btn-outline-light btn-sm rounded-pill">
+                          <i className="bi bi-info-circle"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="d-flex gap-2">
-                  <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
-                    <i className="bi bi-plus-lg me-1"></i>Lista
-                  </button>
-                  <button className="btn btn-outline-light btn-sm rounded-pill">
-                    <i className="bi bi-info-circle"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+              ))}
         </div>
-
+       
         {/* Botón cargar más */}
-        <div className="text-center mt-5">
-          <button className="btn btn-outline-light btn-lg rounded-pill px-5 shadow">
-            <i className="bi bi-arrow-down-circle me-2"></i> Cargar Más
-          </button>
-        </div>
+        {!loading && visibleCount < peliculasFiltradas.length && (
+          <div className="text-center mt-5">
+            <button
+              className="btn btn-outline-light btn-lg rounded-pill px-5 shadow"
+              onClick={() => setVisibleCount((prev) => prev + 16)} 
+            >
+              <i className="bi bi-arrow-down-circle me-2"></i> Cargar Más
+            </button>
+          </div>
+        )}
       </div>      
     </div>
   );
