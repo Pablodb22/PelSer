@@ -12,7 +12,7 @@ export default function SeriesPage() {
   const [series, setSeries] = useState<ISerie[]>([]);
   const [visibleCount, setVisibleCount] = useState(16); 
   const [query, setQuery] = useState(""); 
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true); // ✅ nuevo estado
 
   useEffect(() => {
     async function recuperarCategorias(){
@@ -28,7 +28,7 @@ export default function SeriesPage() {
       );
       const todas = respuestas.flatMap(r => r.results);                                       
       setSeries(todas); 
-      setLoading(false); 
+      setLoading(false); // ✅ se terminó de cargar
     }
 
     recuperarCategorias();
@@ -113,7 +113,7 @@ export default function SeriesPage() {
                 </div>
               ))
             : seriesFiltradas.slice(0, visibleCount).map((serie) => (
-                <div className="col-lg-3 col-md-4 col-sm-6">
+                <div key={serie.id} className="col-lg-3 col-md-4 col-sm-6">
                   <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 movie-card">
                     <div className="position-relative">
                       <img
