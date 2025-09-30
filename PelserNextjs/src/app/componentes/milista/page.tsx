@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+
 export default function MiListaPage() {
   return (
     <div
@@ -8,7 +12,7 @@ export default function MiListaPage() {
         paddingTop: "6vh",
       }}
     >
-      <div className="container py-5">       
+      <div className="container py-5">
         <div className="row mb-5">
           <div className="col-12 text-center">
             <h1 className="display-4 fw-bold mb-2">
@@ -44,12 +48,10 @@ export default function MiListaPage() {
                 Por Ver
               </button>
             </div>
-          </div>  
+          </div>
         </div>
 
-       
         <div className="row g-4">
-         
           <div className="col-lg-3 col-md-4 col-sm-6">
             <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 position-relative">
               <div className="position-relative">
@@ -114,14 +116,17 @@ export default function MiListaPage() {
                   <button className="btn btn-danger btn-sm rounded-pill flex-fill">
                     <i className="bi bi-play-fill me-1"></i>Ver Ahora
                   </button>
-                  <button className="btn btn-outline-light btn-sm rounded-pill">
+                  
+                  <Link
+                    href="/detalle/oppenheimer"
+                    className="btn btn-outline-light btn-sm rounded-pill"
+                  >
                     <i className="bi bi-info-circle"></i>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
-         
         </div>
       </div>
     </div>

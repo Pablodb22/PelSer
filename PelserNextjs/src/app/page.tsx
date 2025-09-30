@@ -6,7 +6,7 @@ import { Skeleton, Box } from '@mui/material';
 import { IPelicula } from './interfaces/IPeliculas';
 import { ISerie } from './interfaces/ISeries';
 
-export default function principal() {
+export default function Principal() {
 const [portada, setPortada] = useState<IPelicula | null>(null);
 const [peliculas, setPeliculas] = useState<IPelicula[] | null>(null);
 const [series, setSeries] = useState<ISerie[] | null>(null);
