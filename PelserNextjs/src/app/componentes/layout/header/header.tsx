@@ -1,74 +1,64 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { Navbar, Nav, Container, NavDropdown, Badge, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Header() {
   const pathname = usePathname();
 
-  function isActive(path: string) { // <-- reemplazamos any por string
-    return pathname === path ? "active" : "";
-  }
+  const isActive = (path: string) => pathname === path;
 
   return (
-    <header className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div className="container">
-        <span className="navbar-brand text-danger fw-bold fs-3">PELSER</span> {/* no es link */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <Link href="/" className={`nav-link ${isActive("/")}`}>Inicio</Link>
-            </li>
-            <li className="nav-item">
-              <Link href="/componentes/peliculas" className={`nav-link ${isActive("/componentes/peliculas")}`}>Películas</Link>
-            </li>
-            <li className="nav-item">
-              <Link href="/componentes/series" className={`nav-link ${isActive("/componentes/series")}`}>Series</Link>
-            </li>
-            <li className="nav-item">
-              <Link href="/componentes/milista" className={`nav-link ${isActive("/componentes/milista")}`}>Mi Lista</Link>
-            </li>
-          </ul>
+    <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
+      <Container>
+        <Navbar.Brand className="text-danger fw-bold fs-3">PELSER</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
+          <Nav className="me-auto">
+            <Link href="/" passHref legacyBehavior>
+              <Nav.Link active={isActive("/")}>Inicio</Nav.Link>
+            </Link>
+            <Link href="/componentes/peliculas" passHref legacyBehavior>
+              <Nav.Link active={isActive("/componentes/peliculas")}>Películas</Nav.Link>
+            </Link>
+            <Link href="/componentes/series" passHref legacyBehavior>
+              <Nav.Link active={isActive("/componentes/series")}>Series</Nav.Link>
+            </Link>
+            <Link href="/componentes/milista" passHref legacyBehavior>
+              <Nav.Link active={isActive("/componentes/milista")}>Mi Lista</Nav.Link>
+            </Link>
+          </Nav>
 
           <div className="d-flex align-items-center">
             {/* Dropdown de notificaciones */}
-            <div className="dropdown me-2">
-              <button
-                className="btn btn-link text-white position-relative"
-                type="button"
-                id="dropdownNotificaciones"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i className="bi bi-bell fs-5"></i>
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  3
+            <NavDropdown
+              title={
+                <span className="position-relative">
+                  <i className="bi bi-bell fs-5 text-white"></i>
+                  <Badge bg="danger" pill className="position-absolute top-0 start-100 translate-middle">
+                    3
+                  </Badge>
                 </span>
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow" aria-labelledby="dropdownNotificaciones" style={{ minWidth: "250px" }}>
-                <li><h6 className="dropdown-header">Notificaciones</h6></li>
-                <li><span className="dropdown-item">🎬 Nueva película agregada</span></li>
-                <li><span className="dropdown-item">📺 Nueva serie disponible</span></li>
-                <li><span className="dropdown-item">❤️ Tu lista tiene 12 elementos</span></li>                
-              </ul>
-            </div>
+              }
+              align="end"
+              menuVariant="dark"
+            >
+              <NavDropdown.Header>Notificaciones</NavDropdown.Header>
+              <NavDropdown.Item>🎬 Nueva película agregada</NavDropdown.Item>
+              <NavDropdown.Item>📺 Nueva serie disponible</NavDropdown.Item>
+              <NavDropdown.Item>❤️ Tu lista tiene 12 elementos</NavDropdown.Item>
+            </NavDropdown>
 
             {/* Perfil */}
-            <Link href="/componentes/configuracion" className="btn btn-link text-white">
-              <i className="bi bi-person-circle fs-5"></i>
+            <Link href="/componentes/configuracion" passHref legacyBehavior>
+              <Button variant="link" className="text-white m-0 p-0 ms-2">
+                <i className="bi bi-person-circle fs-5"></i>
+              </Button>
             </Link>
           </div>
-        </div>
-      </div>
-    </header>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }
