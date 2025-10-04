@@ -31,6 +31,7 @@ export default function IndividualPage() {
                     setPelicula(response);
                 }
 
+                setLoading(false);
             } catch (error) {
                 console.error('Error al cargar la película:', error);
                 setLoading(false);
