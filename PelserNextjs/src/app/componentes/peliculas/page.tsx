@@ -6,13 +6,16 @@ import { ICategoria } from '../../interfaces/ICategorias';
 import { IPelicula } from "@/app/interfaces/IPeliculas";
 import Skeleton from "@mui/material/Skeleton";
 import Box from "@mui/material/Box";
+import { useRouter } from "next/navigation";
+
 
 export default function PeliculasPage() {
   const [categorias, setCategorias] = useState<ICategoria[]>([]); 
   const [peliculas, setPeliculas] = useState<IPelicula[]>([]);
   const [visibleCount, setVisibleCount] = useState(16); 
   const [query, setQuery] = useState(""); 
-  const [loading, setLoading] = useState(true); // ✅ nuevo estado
+  const [loading, setLoading] = useState(true); 
+  const router = useRouter();
 
   useEffect(() => {
     async function recuperarCategorias() {
@@ -28,7 +31,7 @@ export default function PeliculasPage() {
       );
       const todas = respuestas.flatMap(r => r.results);                                       
       setPeliculas(todas);
-      setLoading(false); // ✅ cuando ya tenemos las películas
+      setLoading(false); 
     }
 
     recuperarCategorias();
@@ -38,6 +41,15 @@ export default function PeliculasPage() {
   const peliculasFiltradas = peliculas.filter((pelicula) =>
     pelicula.title.toLowerCase().includes(query.toLowerCase())
   );
+
+  function cargarPorCategoria(idCategoria: number) {
+    return async () => {
+      setLoading(true);
+      const respuesta = await restServicePagina.obtenerPeliculasPorCategoria(idCategoria);
+      setPeliculas(respuesta.results);
+      setLoading(false);
+    }
+  }
 
   return (
     <div
@@ -76,6 +88,7 @@ export default function PeliculasPage() {
                 <button
                   key={cat.id}
                   className="btn btn-outline-light rounded-pill px-4 py-2 transition"
+                  onClick={cargarPorCategoria(cat.id)}
                 >
                   {cat.name}
                 </button>
@@ -93,7 +106,7 @@ export default function PeliculasPage() {
                     <Skeleton
                       variant="rectangular"
                       height={320}
-                      animation="wave"
+                      animation="wave"                      
                     />
                     <Box className="p-4">
                       <Skeleton
@@ -113,7 +126,7 @@ export default function PeliculasPage() {
                 </div>
               ))
             : peliculasFiltradas.slice(0, visibleCount).map((movie) => (
-                <div key={movie.id} className="col-lg-3 col-md-4 col-sm-6">
+                <div key={movie.id} className="col-lg-3 col-md-4 col-sm-6" style={{cursor: 'pointer'}}   onClick={() => router.push(`/componentes/individualPeli/${movie.id}`)}>
                   <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 movie-card">
                     <div className="position-relative">
                       <img

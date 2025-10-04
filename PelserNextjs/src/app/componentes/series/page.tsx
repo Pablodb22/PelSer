@@ -6,14 +6,15 @@ import { ICategoria } from '../../interfaces/ICategorias';
 import { ISerie } from "@/app/interfaces/ISeries";
 import Skeleton from "@mui/material/Skeleton";
 import Box from "@mui/material/Box";
+import { useRouter } from "next/navigation";
 
 export default function SeriesPage() {
   const [categorias, setCategorias] = useState<ICategoria[]>([]); 
   const [series, setSeries] = useState<ISerie[]>([]);
   const [visibleCount, setVisibleCount] = useState(16); 
   const [query, setQuery] = useState(""); 
-  const [loading, setLoading] = useState(true); // ✅ nuevo estado
-
+  const [loading, setLoading] = useState(true); 
+  const router = useRouter();
   useEffect(() => {
     async function recuperarCategorias(){
       const respuesta=await restServicePagina.obtenerCategorias2();      
@@ -26,9 +27,10 @@ export default function SeriesPage() {
       const respuestas = await Promise.all(
         paginas.map(num => restServicePagina.obtenerSeries(num))
       );
-      const todas = respuestas.flatMap(r => r.results);                                       
+      const todas = respuestas.flatMap(r => r.results);     
+      console.log(todas)                                  
       setSeries(todas); 
-      setLoading(false); // ✅ se terminó de cargar
+      setLoading(false); 
     }
 
     recuperarCategorias();
@@ -38,6 +40,16 @@ export default function SeriesPage() {
   const seriesFiltradas = series.filter((serie) =>
     serie.name.toLowerCase().includes(query.toLowerCase())
   );
+
+  function cargarPorCategoria(idCategoria: number) {
+    return async () => {
+      setLoading(true);
+      const respuesta = await restServicePagina.obtenerSeriesPorCategoria(idCategoria);
+      setSeries(respuesta.results);
+      setLoading(false);
+    }
+  }
+
 
    return (
      <div
@@ -76,6 +88,7 @@ export default function SeriesPage() {
                 <button
                   key={cat.id}
                   className="btn btn-outline-light rounded-pill px-4 py-2 transition"
+                  onClick={cargarPorCategoria(cat.id)}
                 >
                   {cat.name}
                 </button>
@@ -113,7 +126,7 @@ export default function SeriesPage() {
                 </div>
               ))
             : seriesFiltradas.slice(0, visibleCount).map((serie) => (
-                <div key={serie.id} className="col-lg-3 col-md-4 col-sm-6">
+                <div key={serie.id} className="col-lg-3 col-md-4 col-sm-6" style={{cursor: 'pointer'}} onClick={() => router.push(`/componentes/individualSerie/${serie.id}`)}>
                   <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 movie-card">
                     <div className="position-relative">
                       <img

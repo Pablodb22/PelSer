@@ -41,12 +41,6 @@ export default function MiListaPage() {
               <button className="btn btn-outline-light rounded-pill px-4">
                 Series
               </button>
-              <button className="btn btn-outline-light rounded-pill px-4">
-                Visto
-              </button>
-              <button className="btn btn-outline-light rounded-pill px-4">
-                Por Ver
-              </button>
             </div>
           </div>
         </div>

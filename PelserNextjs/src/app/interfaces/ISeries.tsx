@@ -4,4 +4,5 @@ export interface ISerie {
     name: string;
     first_air_date: number | string;
     vote_average: number | string;
+    genre_ids: number[];
 }

@@ -71,4 +71,51 @@ export async function obtenerCategorias2() {
     return datos;
 }
 
+export async function obtenerPeliculasPorCategoria(idCategoria: number) {
+    const respuesta=await fetch(`https://api.themoviedb.org/3/discover/movie?with_genres=${idCategoria}&language=es-US&sort_by=popularity.desc&page=1`,{
+        method:'GET',
+        headers:{
+            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
+            'accept':'application/json'
+        }
+    });
+    const datos=await respuesta.json(); 
+    return datos;
+}
+
+export async function obtenerSeriesPorCategoria(idCategoria: number) {
+    const respuesta=await fetch(`https://api.themoviedb.org/3/discover/tv?with_genres=${idCategoria}&language=es-US&sort_by=popularity.desc&page=1`,{
+        method:'GET',
+        headers:{
+            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
+            'accept':'application/json'
+        }
+    });
+    const datos=await respuesta.json(); 
+    return datos;
+}
+
+export async function obtenerPeliculaDetalle(id: number) {
+    const respuesta=await fetch(`https://api.themoviedb.org/3/movie/${id}?language=es-US`,{
+        method:'GET',
+        headers:{
+            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
+            'accept':'application/json'
+        }
+    });
+    const datos=await respuesta.json(); 
+    return datos;
+}
+export async function obtenerSerieDetalle(id: number) {
+    const respuesta=await fetch(`https://api.themoviedb.org/3/tv/${id}?language=es-US`,{
+        method:'GET',
+        headers:{
+            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
+            'accept':'application/json'
+        }
+    });
+    const datos=await respuesta.json(); 
+    return datos;
+}
+
 

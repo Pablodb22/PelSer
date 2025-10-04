@@ -16,18 +16,18 @@ export default function Header() {
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="me-auto">
-            <Link href="/" passHref legacyBehavior>
-              <Nav.Link active={isActive("/")}>Inicio</Nav.Link>
-            </Link>
-            <Link href="/componentes/peliculas" passHref legacyBehavior>
-              <Nav.Link active={isActive("/componentes/peliculas")}>Películas</Nav.Link>
-            </Link>
-            <Link href="/componentes/series" passHref legacyBehavior>
-              <Nav.Link active={isActive("/componentes/series")}>Series</Nav.Link>
-            </Link>
-            <Link href="/componentes/milista" passHref legacyBehavior>
-              <Nav.Link active={isActive("/componentes/milista")}>Mi Lista</Nav.Link>
-            </Link>
+            <Nav.Link as={Link} href="/" active={isActive("/")}>
+              Inicio
+            </Nav.Link>
+            <Nav.Link as={Link} href="/componentes/peliculas" active={isActive("/componentes/peliculas")}>
+              Películas
+            </Nav.Link>
+            <Nav.Link as={Link} href="/componentes/series" active={isActive("/componentes/series")}>
+              Series
+            </Nav.Link>
+            <Nav.Link as={Link} href="/componentes/milista" active={isActive("/componentes/milista")}>
+              Mi Lista
+            </Nav.Link>
           </Nav>
 
           <div className="d-flex align-items-center">
@@ -51,11 +51,9 @@ export default function Header() {
             </NavDropdown>
 
             {/* Perfil */}
-            <Link href="/componentes/configuracion" passHref legacyBehavior>
-              <Button variant="link" className="text-white m-0 p-0 ms-2">
-                <i className="bi bi-person-circle fs-5"></i>
-              </Button>
-            </Link>
+            <Button  href="/componentes/configuracion" variant="link" className="text-white m-0 p-0 ms-2">
+              <i className="bi bi-person-circle fs-5"></i>
+            </Button>
           </div>
         </Navbar.Collapse>
       </Container>
