@@ -20,7 +20,7 @@ export default function IndividualPage() {
 
     const [pelicula, setPelicula] = useState<MediaItem | null>(null);
     const [loading, setLoading] = useState(true);
-
+    const [peliculasParecidas, setPeliculasParecidas] = useState<IPelicula[]>([]);
     useEffect(() => {
         const fetchPelicula = async () => {
             try {
@@ -30,6 +30,18 @@ export default function IndividualPage() {
                 if (response && !response.success) {
                     setPelicula(response);
                 }
+
+                console.log(response)
+                const genreNames = response.genres?.slice(0, 2).map((g: { id: number; name: string }) => g.id).join(', ');
+                const response2 = await restServicePagina.obtenerPeliculasPorCategoria(genreNames);
+
+                if (response2 && response2.results) {
+                    const filtradas = response2.results.filter(
+                        (s: IPelicula) => s.id !== Number(id)
+                    );
+                    setPeliculasParecidas(filtradas);
+                }
+
 
                 setLoading(false);
             } catch (error) {
@@ -258,12 +270,50 @@ export default function IndividualPage() {
                 <div className="mt-5 pb-5">
                     <h3 className="text-white fw-bold mb-4">
                         <i className="bi bi-collection-play me-2"></i>
-                        Películas Similares
+                        Peliculas Similares
                     </h3>
-                    <div className="text-center text-white opacity-50 py-5">
-                        <i className="bi bi-film fs-1 mb-3 d-block"></i>
-                        <p>Próximamente: Recomendaciones personalizadas</p>
-                    </div>
+
+                    {peliculasParecidas && peliculasParecidas.length > 0 ? (
+                        <div className="row g-4">
+                            {peliculasParecidas.slice(1, 7).map((pelis) => (
+                                <div
+                                    key={pelis.id}
+                                    className="col-6 col-md-4 col-lg-2"
+                                    style={{ minWidth: '200px' }}
+                                    onClick={() => router.push(`/componentes/individualPeli/${pelis.id}`)}
+                                >
+                                    <div
+                                        className="card bg-dark border-0 rounded-4 shadow-lg overflow-hidden h-100"
+                                        style={{
+                                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                        }}
+                                    >
+                                        <img
+                                            src={`https://image.tmdb.org/t/p/w500${pelis.poster_path}`}
+                                            alt={pelis.title}
+                                            className="card-img-top"
+                                            style={{
+                                                height: '250px',
+                                                objectFit: 'cover',
+                                            }}
+                                        />
+                                        <div className="card-body text-white p-3">
+                                            <h6 className="fw-bold text-truncate mb-2">{pelis.title}</h6>
+                                            <div className="d-flex align-items-center">
+                                                <i className="bi bi-star-fill text-warning me-2"></i>
+                                                <span>{pelis.vote_average}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-white opacity-50 py-5">
+                            <i className="bi bi-tv fs-1 mb-3 d-block"></i>
+                            <p>No se encontraron peliculas similares.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -18,9 +18,9 @@ export default function IndividualPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
-
   const [serie, setSerie] = useState<SerieDetalle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [seriesparecidas, setSeriesParecidas] = useState<ISerie[]>([]);
 
   useEffect(() => {
     const fetchSerie = async () => {
@@ -30,6 +30,17 @@ export default function IndividualPage() {
 
         if (response && !response.success) {
           setSerie(response);
+        }
+
+        console.log(response)
+        const genreNames = response.genres?.slice(0,2).map((g: { id: number; name: string }) => g.id).join(', ');
+        const response2 = await restServicePagina.obtenerSeriesPorCategoria(genreNames);
+
+        if (response2 && response2.results) {        
+          const filtradas = response2.results.filter(
+            (s: ISerie) => s.id !== Number(id)
+          );
+          setSeriesParecidas(filtradas);
         }
 
         setLoading(false);
@@ -262,17 +273,56 @@ export default function IndividualPage() {
           </div>
         </div>
 
-        {/* Series similares placeholder */}
+        {/* Series similares */}
         <div className="mt-5 pb-5">
           <h3 className="text-white fw-bold mb-4">
             <i className="bi bi-collection-play me-2"></i>
             Series Similares
           </h3>
-          <div className="text-center text-white opacity-50 py-5">
-            <i className="bi bi-tv fs-1 mb-3 d-block"></i>
-            <p>Próximamente: Recomendaciones personalizadas</p>
-          </div>
+
+          {seriesparecidas && seriesparecidas.length > 0 ? (
+            <div className="row g-4">
+              {seriesparecidas.slice(1, 7).map((serieSim) => (
+                <div
+                  key={serieSim.id}
+                  className="col-6 col-md-4 col-lg-2"
+                  style={{ minWidth: '200px' }}
+                  onClick={() => router.push(`/componentes/individualSerie/${serieSim.id}`)}
+                >
+                  <div
+                    className="card bg-dark border-0 rounded-4 shadow-lg overflow-hidden h-100"
+                    style={{
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    }}
+                  >
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${serieSim.backdrop_path}`}
+                      alt={serieSim.name}
+                      className="card-img-top"
+                      style={{
+                        height: '250px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <div className="card-body text-white p-3">
+                      <h6 className="fw-bold text-truncate mb-2">{serieSim.name}</h6>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-star-fill text-warning me-2"></i>
+                        <span>{serieSim.vote_average}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-white opacity-50 py-5">
+              <i className="bi bi-tv fs-1 mb-3 d-block"></i>
+              <p>No se encontraron series similares.</p>
+            </div>
+          )}
         </div>
+
       </div>
     </div>
   );
