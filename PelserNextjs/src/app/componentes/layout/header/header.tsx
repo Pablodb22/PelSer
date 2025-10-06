@@ -51,7 +51,7 @@ export default function Header() {
             </NavDropdown>
 
             {/* Perfil */}
-            <Button  href="/componentes/configuracion" variant="link" className="text-white m-0 p-0 ms-2">
+            <Button  href="/componentes/login" variant="link" className="text-white m-0 p-0 ms-2">
               <i className="bi bi-person-circle fs-5"></i>
             </Button>
           </div>

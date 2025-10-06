@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import * as restServicePagina from './servicios/pagina';
-import * as restSericeCliente from './servicios/cliente';
 import { Skeleton, Box } from '@mui/material';
 import { IPelicula } from './interfaces/IPeliculas';
 import { ISerie } from './interfaces/ISeries';
