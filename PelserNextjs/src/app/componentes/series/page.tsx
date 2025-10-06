@@ -1,41 +1,43 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import * as restServicePagina from '../../servicios/pagina';
-import { ICategoria } from '../../interfaces/ICategorias';
+import * as restServicePagina from "../../servicios/pagina";
+import { ICategoria } from "../../interfaces/ICategorias";
 import { ISerie } from "@/app/interfaces/ISeries";
 import Skeleton from "@mui/material/Skeleton";
 import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
+import Image from "next/image";
 
 export default function SeriesPage() {
-  const [categorias, setCategorias] = useState<ICategoria[]>([]); 
+  const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [series, setSeries] = useState<ISerie[]>([]);
-  const [visibleCount, setVisibleCount] = useState(16); 
-  const [query, setQuery] = useState(""); 
-  const [loading, setLoading] = useState(true); 
+  const [visibleCount, setVisibleCount] = useState(16);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
   useEffect(() => {
-    async function recuperarCategorias(){
-      const respuesta=await restServicePagina.obtenerCategorias2();      
+    async function recuperarCategorias() {
+      const respuesta = await restServicePagina.obtenerCategorias2();
       setCategorias(respuesta.genres);
     }
 
     async function cargarSeries() {
       setLoading(true);
-      const paginas = [1, 2, 3, 4, 5, 6, 7, 8];      
+      const paginas = [1, 2, 3, 4, 5, 6, 7, 8];
       const respuestas = await Promise.all(
-        paginas.map(num => restServicePagina.obtenerSeries(num))
+        paginas.map((num) => restServicePagina.obtenerSeries(num))
       );
-      const todas = respuestas.flatMap(r => r.results);     
-      console.log(todas)                                  
-      setSeries(todas); 
-      setLoading(false); 
+      const todas = respuestas.flatMap((r) => r.results);
+      setSeries(todas);
+      setLoading(false);
     }
 
     recuperarCategorias();
     cargarSeries();
-  },[]);
+  }, []);
 
   const seriesFiltradas = series.filter((serie) =>
     serie.name.toLowerCase().includes(query.toLowerCase())
@@ -44,15 +46,16 @@ export default function SeriesPage() {
   function cargarPorCategoria(idCategoria: number) {
     return async () => {
       setLoading(true);
-      const respuesta = await restServicePagina.obtenerSeriesPorCategoria(idCategoria);
+      const respuesta = await restServicePagina.obtenerSeriesPorCategoria(
+        idCategoria
+      );
       setSeries(respuesta.results);
       setLoading(false);
-    }
+    };
   }
 
-
-   return (
-     <div
+  return (
+    <div
       className="min-vh-100"
       style={{
         background: "linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%)",
@@ -60,8 +63,13 @@ export default function SeriesPage() {
         marginTop: "6vh",
       }}
     >
+      {/* ✅ Carga asíncrona del script externo (Bootstrap, etc.) */}
+      <Script
+        src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"
+        strategy="lazyOnload"
+      />
+
       <div className="container py-5">
-      
         {/* Buscador */}
         <div className="row mb-5 justify-content-center">
           <div className="col-lg-8 col-md-10">
@@ -74,12 +82,12 @@ export default function SeriesPage() {
                 className="form-control bg-dark text-white border-0"
                 placeholder="Buscar Serie..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)} 
+                onChange={(e) => setQuery(e.target.value)}
               />
             </div>
           </div>
         </div>
-       
+
         {/* Categorías */}
         <div className="row mb-5">
           <div className="col-12 text-center">
@@ -96,7 +104,7 @@ export default function SeriesPage() {
             </div>
           </div>
         </div>
-        
+
         {/* Series o Skeletons */}
         <div className="row g-4">
           {loading
@@ -126,15 +134,26 @@ export default function SeriesPage() {
                 </div>
               ))
             : seriesFiltradas.slice(0, visibleCount).map((serie) => (
-                <div key={serie.id} className="col-lg-3 col-md-4 col-sm-6" style={{cursor: 'pointer'}} onClick={() => router.push(`/componentes/individualSerie/${serie.id}`)}>
+                <div
+                  key={serie.id}
+                  className="col-lg-3 col-md-4 col-sm-6"
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    router.push(`/componentes/individualSerie/${serie.id}`)
+                  }
+                >
                   <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 movie-card">
                     <div className="position-relative">
-                      <img
+                      {/* ✅ Reemplazado <img> por <Image /> */}
+                      <Image
                         src={`https://image.tmdb.org/t/p/w500${serie.backdrop_path}`}
-                        className="card-img-top"
                         alt={serie.name}
-                        style={{ height: "320px", objectFit: "cover" }}
+                        className="card-img-top"
+                        width={500}
+                        height={320}
+                        style={{ objectFit: "cover", height: "320px" }}
                       />
+
                       <div className="card-img-overlay d-flex align-items-center justify-content-center p-0 opacity-0 hover-overlay">
                         <button className="btn btn-light rounded-circle shadow d-flex align-items-center justify-content-center">
                           <i className="bi bi-play-fill fs-3 text-dark"></i>
@@ -144,12 +163,15 @@ export default function SeriesPage() {
                         className="position-absolute bottom-0 start-0 w-100"
                         style={{
                           height: "50%",
-                          background: "linear-gradient(transparent, rgba(0,0,0,0.85))",
+                          background:
+                            "linear-gradient(transparent, rgba(0,0,0,0.85))",
                         }}
                       ></div>
                     </div>
                     <div className="card-body p-4">
-                      <h5 className="card-title fw-bold mb-3">{serie.name}</h5>
+                      <h5 className="card-title fw-bold mb-3">
+                        {serie.name}
+                      </h5>
                       <div className="d-flex align-items-center justify-content-between mb-3">
                         <small className="text-light opacity-75">
                           <i className="bi bi-calendar3 me-2"></i>
@@ -173,19 +195,19 @@ export default function SeriesPage() {
                 </div>
               ))}
         </div>
-       
+
         {/* Botón cargar más */}
         {!loading && visibleCount < seriesFiltradas.length && (
           <div className="text-center mt-5">
             <button
               className="btn btn-outline-light btn-lg rounded-pill px-5 shadow"
-              onClick={() => setVisibleCount((prev) => prev + 16)} 
+              onClick={() => setVisibleCount((prev) => prev + 16)}
             >
               <i className="bi bi-arrow-down-circle me-2"></i> Cargar Más
             </button>
           </div>
         )}
-      </div>      
+      </div>
     </div>
   );
 }
