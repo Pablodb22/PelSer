@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
-import Image from "next/image";
 
 export default function MiListaPage() {
   return (
@@ -14,12 +12,6 @@ export default function MiListaPage() {
         paddingTop: "6vh",
       }}
     >
-      {/* ✅ Carga asíncrona de Bootstrap o scripts externos */}
-      <Script
-        src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"
-        strategy="lazyOnload"
-      />
-
       <div className="container py-5">
         <div className="row mb-5">
           <div className="col-12 text-center">
@@ -57,16 +49,12 @@ export default function MiListaPage() {
           <div className="col-lg-3 col-md-4 col-sm-6">
             <div className="card bg-dark text-white border-0 rounded-4 shadow-lg overflow-hidden h-100 position-relative">
               <div className="position-relative">
-                {/* ✅ Reemplazado <img> por <Image /> */}
-                <Image
+                <img
                   src="https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg"
-                  alt="Oppenheimer"
                   className="card-img-top"
-                  width={500}
-                  height={320}
+                  alt="Oppenheimer"
                   style={{ height: "320px", objectFit: "cover" }}
                 />
-
                 <div
                   className="card-img-overlay d-flex align-items-center justify-content-center p-0"
                   style={{
@@ -82,7 +70,6 @@ export default function MiListaPage() {
                     <i className="bi bi-play-fill fs-3 text-dark"></i>
                   </button>
                 </div>
-
                 <div className="position-absolute top-0 start-0 m-3">
                   <button
                     className="btn btn-danger btn-sm rounded-circle"
@@ -91,11 +78,9 @@ export default function MiListaPage() {
                     <i className="bi bi-x-lg"></i>
                   </button>
                 </div>
-
                 <div className="position-absolute top-0 end-0 m-3">
                   <span className="badge bg-success">PELÍCULA</span>
                 </div>
-
                 <div
                   className="position-absolute bottom-0 start-0 w-100"
                   style={{
@@ -105,10 +90,8 @@ export default function MiListaPage() {
                   }}
                 ></div>
               </div>
-
               <div className="card-body p-4">
                 <h5 className="card-title fw-bold mb-3">Oppenheimer</h5>
-
                 <div className="d-flex align-items-center justify-content-between mb-3">
                   <small className="text-light opacity-75">
                     <i className="bi bi-calendar3 me-2"></i>2023
@@ -117,19 +100,17 @@ export default function MiListaPage() {
                     <i className="bi bi-star-fill me-1"></i>8.4
                   </span>
                 </div>
-
                 <div className="mb-3">
                   <small className="text-success">
                     <i className="bi bi-plus-circle-fill me-1"></i>Agregado hace
                     2 días
                   </small>
                 </div>
-
                 <div className="d-flex gap-2">
                   <button className="btn btn-danger btn-sm rounded-pill flex-fill">
                     <i className="bi bi-play-fill me-1"></i>Ver Ahora
                   </button>
-
+                  
                   <Link
                     href="/detalle/oppenheimer"
                     className="btn btn-outline-light btn-sm rounded-pill"
