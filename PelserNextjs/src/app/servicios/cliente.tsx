@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseServer } from '../lib/supabaseCliente'
+import { supabaseServer } from '../lib/supabaseServidor'
 
 export async function registrarUsario(usuario: {nombre: string, apellidos: string, nombre_usuario: string, correo: string, contrasena: string, fecha_creacion: string}) {
 
