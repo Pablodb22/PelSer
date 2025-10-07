@@ -34,7 +34,8 @@ export default function RegistroPage (){
                 alert('Usuario registrado correctamente ✅')
                 window.location.href = '/componentes/login';
             }else{
-                alert('Error al registrar el usuario ❌')                
+                alert('Error al registrar el usuario ❌')
+                console.error('Error en la respuesta del servidor:', respuesta.error);                
             }            
         }catch(error){
             console.error('Error al registrar el usuario:', error);
