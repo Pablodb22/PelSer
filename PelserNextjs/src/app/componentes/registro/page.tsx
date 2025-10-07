@@ -29,9 +29,13 @@ export default function RegistroPage (){
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
         try{
-
-            //const respuesta= await restServiceCliente.registrarUsario(formData)
-            
+            const respuesta= await restServiceCliente.registrarUsario(formData)
+            if(respuesta.ok){
+                alert('Usuario registrado correctamente ✅')
+                window.location.href = '/componentes/login';
+            }else{
+                alert('Error al registrar el usuario ❌')                
+            }            
         }catch(error){
             console.error('Error al registrar el usuario:', error);
         
