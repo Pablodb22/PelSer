@@ -6,12 +6,14 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import Link from 'next/link'
 import Script from 'next/script'
 import * as restServiceCliente from '../../servicios/cliente';
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
   const [mensaje, setMensaje] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
+  const router = useRouter()
 
   const handleLogin = async () => {
     setCargando(true)
@@ -22,6 +24,8 @@ export default function LoginPage() {
          
       if (res.ok) {
         setMensaje(`✅ Bienvenido, ${res.usuario.nombre_usuario}`)
+        localStorage.setItem('usuario', JSON.stringify(res.usuario))
+        router.push('/')
       } else {
         setMensaje(`❌ ${res.mensaje || 'Error al iniciar sesión'}`)
       }

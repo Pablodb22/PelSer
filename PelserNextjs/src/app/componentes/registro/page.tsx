@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react'
 import * as restServiceCliente from '../../servicios/cliente';
 import Script from 'next/script';
+import bcrypt from 'bcryptjs';
 
 export default function RegistroPage (){
 
@@ -20,27 +21,31 @@ export default function RegistroPage (){
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
+      setFormData({
         ...formData,
-        [e.target.name]: e.target.value,
-        })
+        [e.target.name]: e.target.value
+      })
     }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-        try{
-            const respuesta= await restServiceCliente.registrarUsario(formData)
-            if(respuesta.ok){
-                alert('Usuario registrado correctamente ✅')
-                window.location.href = '/componentes/login';
-            }else{
-                alert('Error al registrar el usuario ❌')
-                console.error('Error en la respuesta del servidor:', respuesta.error);                
-            }            
-        }catch(error){
-            console.error('Error al registrar el usuario:', error);
-        
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault()
+      try {
+        // Encripta la contraseña aquí, justo antes de enviar
+        const usuario = {
+          ...formData,
+          contrasena: bcrypt.hashSync(formData.contrasena, 10)
         }
+        const respuesta = await restServiceCliente.registrarUsario(usuario)
+        if (respuesta.ok) {
+          alert('Usuario registrado correctamente ✅')
+          window.location.href = '/componentes/login';
+        } else {
+          alert('Error al registrar el usuario ❌')
+          console.error('Error en la respuesta del servidor:', respuesta.error);
+        }
+      } catch (error) {
+        console.error('Error al registrar el usuario:', error);
+      }
     }
 
 

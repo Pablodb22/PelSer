@@ -1,6 +1,21 @@
-"use client"; // si usas App Router de Next.js
+"use client";
+import React, { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import * as restServiceCliente from "../../servicios/cliente";
 
 export default function PerfilPage() {
+
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+
   return (
     <div
       className="bg-dark text-white"
@@ -79,7 +94,7 @@ export default function PerfilPage() {
                       <input
                         type="text"
                         className="form-control bg-secondary text-white border-0"
-                        value="Juan Pérez"
+                        value={user ? `${user.nombre} ${user.apellidos}` : 'Cargando...'}
                         readOnly
                       />
                       <button className="btn btn-outline-light" type="button">
@@ -96,7 +111,7 @@ export default function PerfilPage() {
                       <input
                         type="email"
                         className="form-control bg-secondary text-white border-0"
-                        value="juan.perez@email.com"
+                        value={user ? `${user.correo}` : 'Cargando...'}
                         readOnly
                       />
                       <button className="btn btn-outline-light" type="button">
@@ -113,7 +128,7 @@ export default function PerfilPage() {
                       <input
                         type="text"
                         className="form-control bg-secondary text-white border-0"
-                        value="@juanperez2024"
+                        value={user ? `${user.nombre_usuario}` : 'Cargando...'}
                         readOnly
                       />
                       <button className="btn btn-outline-light" type="button">
@@ -129,7 +144,16 @@ export default function PerfilPage() {
                     <input
                       type="text"
                       className="form-control bg-secondary text-white border-0"
-                      value="15 de Marzo, 2024"
+                      value={
+                        user
+                          ? new Date(user.fecha_creacion).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })
+                          : 'Cargando...'
+                      }
+
                       readOnly
                     />
                   </div>
@@ -164,7 +188,7 @@ export default function PerfilPage() {
                         type="password"
                         className="form-control bg-secondary text-white border-0"
                         placeholder="Ingresa tu contraseña actual"
-                      />                     
+                      />
                     </div>
                   </div>
 
@@ -177,7 +201,7 @@ export default function PerfilPage() {
                         type="password"
                         className="form-control bg-secondary text-white border-0"
                         placeholder="Ingresa tu nueva contraseña"
-                      />                     
+                      />
                     </div>
                   </div>
 
@@ -190,7 +214,7 @@ export default function PerfilPage() {
                         type="password"
                         className="form-control bg-secondary text-white border-0"
                         placeholder="Confirma tu nueva contraseña"
-                      />                      
+                      />
                     </div>
                   </div>
                 </div>
@@ -203,7 +227,7 @@ export default function PerfilPage() {
               </div>
             </div>
 
-                   
+
             <div className="card bg-dark border-secondary rounded-4 shadow-lg mb-4">
               <div className="card-header bg-transparent border-bottom border-secondary p-4">
                 <h4 className="fw-bold mb-0">
@@ -232,6 +256,6 @@ export default function PerfilPage() {
           </div>
         </div>
       </div>
-    </div>     
+    </div>
   );
 }
