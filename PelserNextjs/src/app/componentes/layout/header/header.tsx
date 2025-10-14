@@ -3,11 +3,17 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Navbar, Nav, Container, NavDropdown, Badge, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
-  const pathname = usePathname();
-
-  const isActive = (path: string) => pathname === path;
+  //const pathname = usePathname();
+  const [usuarioLocal, setUsuarioLocal] = useState<string | null>(null);
+  //const isActive = (path: string) => pathname === path;
+  
+  useEffect(() => {
+    const usuario = localStorage.getItem('usuario');
+    setUsuarioLocal(usuario);
+  }, []);
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
@@ -16,16 +22,16 @@ export default function Header() {
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} href="/" active={isActive("/")}>
+            <Nav.Link as={Link} href="/" >
               Inicio
             </Nav.Link>
-            <Nav.Link as={Link} href="/componentes/peliculas" active={isActive("/componentes/peliculas")}>
+            <Nav.Link as={Link} href="/componentes/peliculas" >
               Películas
             </Nav.Link>
-            <Nav.Link as={Link} href="/componentes/series" active={isActive("/componentes/series")}>
+            <Nav.Link as={Link} href="/componentes/series" >
               Series
             </Nav.Link>
-            <Nav.Link as={Link} href="/componentes/milista" active={isActive("/componentes/milista")}>
+            <Nav.Link as={Link} href="/componentes/milista">
               Mi Lista
             </Nav.Link>
           </Nav>
@@ -51,9 +57,23 @@ export default function Header() {
             </NavDropdown>
 
             {/* Perfil */}
-            <Button  href="/componentes/login" variant="link" className="text-white m-0 p-0 ms-2">
-              <i className="bi bi-person-circle fs-5"></i>
-            </Button>
+            {usuarioLocal ? (
+              <Button
+                href="/componentes/configuracion"
+                variant="link"
+                className="text-white m-0 p-0 ms-2"
+              >
+                <i className="bi bi-person-circle fs-5"></i>
+              </Button>
+            ) : (
+              <Button
+                href="/componentes/login"
+                variant="link"
+                className="text-white m-0 p-0 ms-2"
+              >
+                <i className="bi bi-person-circle fs-5"></i>
+              </Button>
+            )}
           </div>
         </Navbar.Collapse>
       </Container>
