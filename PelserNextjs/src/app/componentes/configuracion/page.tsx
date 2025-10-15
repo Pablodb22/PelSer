@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import * as restServiceCliente from '../../servicios/cliente';
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 export default function PerfilPage() {
   const [user, setUser] = useState<any>(null);
   const [avatars, setAvatars] = useState<string[]>([]);
@@ -13,12 +14,17 @@ export default function PerfilPage() {
   const [contrasenaActual, setContrasenaActual] = useState<string>("");
   const [nuevaContrasena, setNuevaContrasena] = useState<string>("");
   const [confirmarContrasena, setConfirmarContrasena] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-  
-    const storedUser = localStorage.getItem("usuario");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    setMounted(true);
+    
+    // Solo acceder a localStorage después del montaje en el cliente
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem("usuario");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
     }
     
     generateAvatars();
@@ -53,7 +59,7 @@ export default function PerfilPage() {
   };
 
   const handleSaveAvatar = async () => {
-    if (selectedAvatar && user) {
+    if (selectedAvatar && user && typeof window !== 'undefined') {
       try {
         const result = await restServiceCliente.actualizarAvatarUsuario(user.id, selectedAvatar);
         
@@ -73,7 +79,8 @@ export default function PerfilPage() {
   };
 
   const handleGuardarCambios = async () => {
-    if (!user) return;
+    if (!user || typeof window === 'undefined') return;
+    
     const result = await restServiceCliente.configurarUsuario(user.id, correo, nombreUsuario);
     if (result.ok) {
       const updatedUser = { ...user, correo, nombre_usuario: nombreUsuario };
@@ -102,21 +109,44 @@ export default function PerfilPage() {
     }
   };
 
-    const handleLogout = () => {
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
       localStorage.removeItem("usuario");
       window.location.href = "/";
-    };
+    }
+  };
 
-    const handleDeleteAccount = async () => {
-      if (!user) return;      
-      const data=await restServiceCliente.borrarCuenta(user.id);
-      if (data.ok) {
-        localStorage.removeItem("usuario");
-        window.location.href = "/";
-      } else {
-        alert("Error al eliminar la cuenta");
-      }
-    };
+  const handleDeleteAccount = async () => {
+    if (!user || typeof window === 'undefined') return;
+    
+    const data = await restServiceCliente.borrarCuenta(user.id);
+    if (data.ok) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/";
+    } else {
+      alert("Error al eliminar la cuenta");
+    }
+  };
+
+  // Mostrar un loading mientras el componente se monta en el cliente
+  if (!mounted) {
+    return (
+      <div
+        className="bg-dark text-white d-flex align-items-center justify-content-center"
+        style={{
+          background: "linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%)",
+          minHeight: "100vh",
+        }}
+      >
+        <div className="text-center">
+          <div className="spinner-border text-danger" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p className="mt-3">Cargando perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
