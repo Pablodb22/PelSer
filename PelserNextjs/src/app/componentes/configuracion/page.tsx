@@ -60,17 +60,7 @@ export default function PerfilPage() {
         if (result.ok) {         
           const updatedUser = { ...user, avatar_url: selectedAvatar };
           localStorage.setItem("usuario", JSON.stringify(updatedUser));
-          setUser(updatedUser);
-                   
-            const modalElement = document.getElementById("avatarModal");
-            if (modalElement) {
-              const bootstrap = (window as any).bootstrap;
-              const modal = bootstrap.Modal.getInstance(modalElement);
-              if (modal) {
-                modal.hide();
-              }
-            }
-          
+          setUser(updatedUser);                                        
           alert("Avatar actualizado correctamente");
         } else {
           throw new Error("Error al actualizar el avatar");
