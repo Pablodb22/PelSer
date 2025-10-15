@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import * as restServiceCliente from '../../servicios/cliente';
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function PerfilPage() {
   const [user, setUser] = useState<any>(null);
@@ -17,6 +16,12 @@ export default function PerfilPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Cargar Bootstrap JS solo en el cliente
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      import("bootstrap/dist/js/bootstrap.bundle.min.js");
+    }
+    
     setMounted(true);
     
     // Solo acceder a localStorage después del montaje en el cliente
