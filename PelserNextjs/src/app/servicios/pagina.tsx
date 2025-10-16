@@ -118,4 +118,50 @@ export async function obtenerSerieDetalle(id: number) {
     return datos;
 }
 
+export async function obtenerListaUsuario(id:number){
+    const respuesta=await fetch(`${window.location.origin}/api/lista/consultar`,{
+        method:'POST',
+        body: JSON.stringify({id}),
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
+}
 
+export async function agregarPeliculaLista(id_usuario:number, id_pelicula:number, id_series:number){
+    const respuesta=await fetch(`${window.location.origin}/api/lista/crear/pelis`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_pelicula, id_series}), 
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
+}
+
+export async function agregarSerieLista(id_usuario:number, id_pelicula:number, id_series:number){
+    const respuesta=await fetch(`${window.location.origin}/api/lista/crear/series`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_pelicula, id_series}), 
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
+}
+
+export async function borrarListaUsuario(id_usuario:number,id:number){
+    const respuesta=await fetch(`${window.location.origin}/api/lista/borrar`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario,id}),
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
+}

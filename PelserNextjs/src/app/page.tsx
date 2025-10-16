@@ -12,8 +12,13 @@ export default function Principal() {
   const [peliculas, setPeliculas] = useState<IPelicula[] | null>(null);
   const [series, setSeries] = useState<ISerie[] | null>(null);
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    const usuario = localStorage.getItem('usuario');
+    if (usuario) {
+      setUser(JSON.parse(usuario));
+    }
     async function cargarPeliculas() {
       const paginas = [1, 2, 3, 4, 5];
       const respuestas = await Promise.all(
@@ -41,6 +46,24 @@ export default function Principal() {
     cargarSeries();
     cargarPeliculas();
   }, []);
+
+  async function agregarMiLista() {
+    if (!user) {
+      router.push('/componentes/login');
+      return;
+    }
+
+    if (!portada || typeof portada.id !== 'number') {
+      console.warn('No hay una película destacada seleccionada para agregar.');
+      return;
+    }
+
+    try {
+      const respuesta = await restServicePagina.agregarPeliculaLista(user.id, portada.id, 0);
+    } catch (error) {
+      console.error('Error al agregar a Mi Lista:', error);
+    }
+  }
 
   return (
     <div className="bg-dark min-vh-100">
@@ -92,29 +115,12 @@ export default function Principal() {
                     {portada.title}
                   </h1>
 
-                  {/* Movie Info */}
-                  <div className="d-flex flex-wrap align-items-center gap-4 mb-5">
-                    <div className="d-flex align-items-center">
-                      <i className="bi bi-calendar3 text-warning me-2 fs-5"></i>
-                      <span className="fs-5 fw-semibold">{portada.release_date}</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <i className="bi bi-star-fill text-warning me-2 fs-5"></i>
-                      <span className="fs-5 fw-bold text-warning">{portada.vote_average}</span>
-                      <span className="text-light opacity-75 ms-1">/10</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <i className="bi bi-eye text-info me-2 fs-5"></i>
-                      <span className="fs-6 text-info">Popular</span>
-                    </div>
-                  </div>
-
                   {/* Action Buttons */}
                   <div className="d-flex flex-wrap gap-3">
-                    <button className="btn btn-light btn-lg fw-bold px-5 py-3 rounded-pill shadow-lg">
+                    <button className="btn btn-light btn-lg fw-bold px-5 py-3 rounded-pill shadow-lg" onClick={agregarMiLista}>
                       <i className="bi bi-plus-lg me-2 fs-4"></i>Mi Lista
                     </button>
-                    <button className="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                    <button className="btn btn-outline-light btn-lg px-4 py-3 rounded-pill" onClick={() => router.push(`/componentes/individualPeli/${portada.id}`)}>
                       <i className="bi bi-info-circle fs-4"></i>
                     </button>
                   </div>
@@ -288,27 +294,6 @@ export default function Principal() {
                               <h5 className="card-title fw-bold mb-3 lh-sm" style={{ fontSize: '1.1rem' }}>
                                 {movie.title}
                               </h5>
-
-                              <div className="d-flex align-items-center justify-content-between">
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-calendar3 text-muted me-2"></i>
-                                  <small className="text-light opacity-75">{movie.release_date}</small>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-star-fill text-warning me-1"></i>
-                                  <span className="fw-bold text-warning">{movie.vote_average}</span>
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              <div className="d-flex gap-2 mt-3">
-                                <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
-                                  <i className="bi bi-plus-lg me-1"></i>Lista
-                                </button>
-                                <button className="btn btn-outline-light btn-sm rounded-pill">
-                                  <i className="bi bi-info-circle"></i>
-                                </button>
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -449,35 +434,13 @@ export default function Principal() {
                                   <i className="bi bi-play-fill fs-3 text-dark"></i>
                                 </button>
                               </div>
-                            </div>
-
+                            </div>   
                             {/* Card Content */}
                             <div className="card-body p-4">
                               <h5 className="card-title fw-bold mb-3 lh-sm" style={{ fontSize: '1.1rem' }}>
                                 {movie.title}
                               </h5>
-
-                              <div className="d-flex align-items-center justify-content-between">
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-calendar3 text-muted me-2"></i>
-                                  <small className="text-light opacity-75">{movie.release_date}</small>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-star-fill text-warning me-1"></i>
-                                  <span className="fw-bold text-warning">{movie.vote_average}</span>
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              <div className="d-flex gap-2 mt-3">
-                                <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
-                                  <i className="bi bi-plus-lg me-1"></i>Lista
-                                </button>
-                                <button className="btn btn-outline-light btn-sm rounded-pill">
-                                  <i className="bi bi-info-circle"></i>
-                                </button>
-                              </div>
-                            </div>
+                            </div>                      
                           </div>
                         </div>
                       ))
@@ -624,27 +587,6 @@ export default function Principal() {
                               <h5 className="card-title fw-bold mb-3 lh-sm" style={{ fontSize: '1.1rem' }}>
                                 {movie.title}
                               </h5>
-
-                              <div className="d-flex align-items-center justify-content-between">
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-calendar3 text-muted me-2"></i>
-                                  <small className="text-light opacity-75">{movie.release_date}</small>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-star-fill text-warning me-1"></i>
-                                  <span className="fw-bold text-warning">{movie.vote_average}</span>
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              <div className="d-flex gap-2 mt-3">
-                                <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
-                                  <i className="bi bi-plus-lg me-1"></i>Lista
-                                </button>
-                                <button className="btn btn-outline-light btn-sm rounded-pill">
-                                  <i className="bi bi-info-circle"></i>
-                                </button>
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -799,28 +741,7 @@ export default function Principal() {
                             <div className="card-body p-4">
                               <h5 className="card-title fw-bold mb-3 lh-sm" style={{ fontSize: '1.1rem' }}>
                                 {series.name}
-                              </h5>
-
-                              <div className="d-flex align-items-center justify-content-between">
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-calendar3 text-muted me-2"></i>
-                                  <small className="text-light opacity-75">{series.first_air_date}</small>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                  <i className="bi bi-star-fill text-warning me-1"></i>
-                                  <span className="fw-bold text-warning">{series.vote_average}</span>
-                                </div>
-                              </div>
-
-                              {/* Action Buttons */}
-                              <div className="d-flex gap-2 mt-3">
-                                <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
-                                  <i className="bi bi-plus-lg me-1"></i>Lista
-                                </button>
-                                <button className="btn btn-outline-light btn-sm rounded-pill">
-                                  <i className="bi bi-info-circle"></i>
-                                </button>
-                              </div>
+                              </h5>                              
                             </div>
                           </div>
                         </div>

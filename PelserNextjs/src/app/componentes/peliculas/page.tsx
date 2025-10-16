@@ -150,24 +150,6 @@ export default function PeliculasPage() {
                     </div>
                     <div className="card-body p-4">
                       <h5 className="card-title fw-bold mb-3">{movie.title}</h5>
-                      <div className="d-flex align-items-center justify-content-between mb-3">
-                        <small className="text-light opacity-75">
-                          <i className="bi bi-calendar3 me-2"></i>
-                          {movie.release_date}
-                        </small>
-                        <span className="fw-bold text-warning">
-                          <i className="bi bi-star-fill me-1"></i>
-                          {movie.vote_average}
-                        </span>
-                      </div>
-                      <div className="d-flex gap-2">
-                        <button className="btn btn-outline-light btn-sm rounded-pill flex-fill">
-                          <i className="bi bi-plus-lg me-1"></i>Lista
-                        </button>
-                        <button className="btn btn-outline-light btn-sm rounded-pill">
-                          <i className="bi bi-info-circle"></i>
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>

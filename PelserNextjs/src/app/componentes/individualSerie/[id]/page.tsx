@@ -21,6 +21,14 @@ export default function IndividualPage() {
   const [serie, setSerie] = useState<SerieDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [seriesparecidas, setSeriesParecidas] = useState<ISerie[]>([]);
+  const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+    const usuario = localStorage.getItem('usuario');
+    if (usuario) {
+      setUser(JSON.parse(usuario));
+    }
+    }, []);
 
   useEffect(() => {
     const fetchSerie = async () => {
@@ -55,6 +63,23 @@ export default function IndividualPage() {
     }
   }, [id]);
 
+ async function agregarMiLista() {
+        if (!user) {
+          router.push('/componentes/login');
+          return;
+        }
+    
+        if (!serie || typeof serie.id !== 'number') {
+          console.warn('No hay una película destacada seleccionada para agregar.');
+          return;
+        }
+    
+        try {
+          const respuesta = await restServicePagina.agregarPeliculaLista(user.id,0, serie.id);
+        } catch (error) {
+          console.error('Error al agregar a Mi Lista:', error);
+        }
+      }
   if (loading) {
     return (
       <div
@@ -215,7 +240,7 @@ export default function IndividualPage() {
                 <button className="btn btn-light btn-lg rounded-pill px-5 shadow-lg">
                   <i className="bi bi-play-fill me-2 fs-5"></i>Reproducir
                 </button>
-                <button className="btn btn-outline-light btn-lg rounded-pill px-5 shadow">
+                <button className="btn btn-outline-light btn-lg rounded-pill px-5 shadow" onClick={agregarMiLista}>
                   <i className="bi bi-plus-lg me-2"></i>Mi Lista
                 </button>
                 <button className="btn btn-outline-light btn-lg rounded-circle shadow" style={{ width: '60px', height: '60px' }}>

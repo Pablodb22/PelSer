@@ -17,11 +17,19 @@ export default function IndividualPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id;
-
     const [pelicula, setPelicula] = useState<MediaItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [peliculasParecidas, setPeliculasParecidas] = useState<IPelicula[]>([]);
+    const [user, setUser] = useState<any>(null);
+
     useEffect(() => {
+    const usuario = localStorage.getItem('usuario');
+    if (usuario) {
+      setUser(JSON.parse(usuario));
+    }
+    }, []);
+
+    useEffect(() => {        
         const fetchPelicula = async () => {
             try {
                 setLoading(true);
@@ -54,6 +62,25 @@ export default function IndividualPage() {
             fetchPelicula();
         }
     }, [id]);
+
+      async function agregarMiLista() {
+        if (!user) {
+          router.push('/componentes/login');
+          return;
+        }
+    
+        if (!pelicula || typeof pelicula.id !== 'number') {
+          console.warn('No hay una película destacada seleccionada para agregar.');
+          return;
+        }
+    
+        try {
+          const respuesta = await restServicePagina.agregarPeliculaLista(user.id, pelicula.id, 0);
+        } catch (error) {
+          console.error('Error al agregar a Mi Lista:', error);
+        }
+      }
+    
 
     if (loading) {
         return (
@@ -209,7 +236,7 @@ export default function IndividualPage() {
                                 <button className="btn btn-light btn-lg rounded-pill px-5 shadow-lg">
                                     <i className="bi bi-play-fill me-2 fs-5"></i>Reproducir
                                 </button>
-                                <button className="btn btn-outline-light btn-lg rounded-pill px-5 shadow">
+                                <button className="btn btn-outline-light btn-lg rounded-pill px-5 shadow" onClick={agregarMiLista}>
                                     <i className="bi bi-plus-lg me-2"></i>Mi Lista
                                 </button>
                                 <button className="btn btn-outline-light btn-lg rounded-circle shadow" style={{ width: '60px', height: '60px' }}>
