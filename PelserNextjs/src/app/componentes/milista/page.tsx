@@ -16,7 +16,7 @@ export default function MiListaPage() {
   const [series, setSeries] = useState<ISerie[]>([]);
   const [conjunto, setConjunto] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState<'todos' | 'peliculas' | 'series'>('todos'); // 👈 nuevo estado
+  const [filtro, setFiltro] = useState<'todos' | 'peliculas' | 'series'>('todos');
 
   useEffect(() => {
     const user = localStorage.getItem('usuario');
@@ -126,7 +126,7 @@ export default function MiListaPage() {
     }
   }
 
-  // 👇 Filtrado dinámico según el botón seleccionado
+
   const itemsFiltrados =
     filtro === 'todos'
       ? conjunto
@@ -160,7 +160,6 @@ export default function MiListaPage() {
           </div>
         </div>
 
-        {/* 🔘 BOTONES DE FILTRO */}
         <div className="row mb-4">
           <div className="col-md-6">
             <div className="d-flex gap-2 flex-wrap">
@@ -186,7 +185,6 @@ export default function MiListaPage() {
           </div>
         </div>
 
-        {/* 🎬 CONTENIDO FILTRADO */}
         <div className="row g-4 mb-5">
           {loading
             ? Array.from({ length: lista.length || 8 }).map((_, i) => (
