@@ -7,12 +7,41 @@ const supabaseServer = createClient(
 )
 
 export async function POST(req: NextRequest) {
-
+  try {
     const { id_usuario, id_pelicula, id_series } = await req.json()
-    const {data,error} = await supabaseServer.from('milista').insert([{id_pelicula, id_series, id_usuario}]).select()
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Primero verificamos si ya existe un registro igual
+    const { data: existente, error: errorSelect } = await supabaseServer
+      .from('milista')
+      .select('*')
+      .eq('id_usuario', id_usuario)
+      .eq('id_pelicula', id_pelicula)
+      .maybeSingle() // devuelve 1 o null
+
+    if (errorSelect) {
+      throw new Error(errorSelect.message)
     }
+
+    if (existente) {
+      // Ya existe en la lista del usuario
+      return NextResponse.json(
+        { ok: false, message: 'Esta película ya está en la lista del usuario.' },
+        { status: 400 }
+      )
+    }
+
+    // Si no existe, insertamos
+    const { data, error } = await supabaseServer
+      .from('milista')
+      .insert([{ id_pelicula, id_series, id_usuario }])
+      .select()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
     return NextResponse.json({ ok: true, data })
-    
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
 }

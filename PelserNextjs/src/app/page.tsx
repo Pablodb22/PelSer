@@ -60,6 +60,12 @@ export default function Principal() {
 
     try {
       const respuesta = await restServicePagina.agregarPeliculaLista(user.id, portada.id, 0);
+      if(respuesta.ok){
+        alert('Película agregada a Mi Lista');
+      }     
+      if(respuesta.ok === false){
+        alert(respuesta.message);
+      }
     } catch (error) {
       console.error('Error al agregar a Mi Lista:', error);
     }

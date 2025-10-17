@@ -76,6 +76,12 @@ export default function IndividualPage() {
     
         try {
           const respuesta = await restServicePagina.agregarPeliculaLista(user.id, pelicula.id, 0);
+          if(respuesta.ok){
+            alert('Película agregada a Mi Lista');
+        }   
+        if(respuesta.ok === false){
+            alert(respuesta.message);
+        }
         } catch (error) {
           console.error('Error al agregar a Mi Lista:', error);
         }

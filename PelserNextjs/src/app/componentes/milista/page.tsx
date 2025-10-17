@@ -16,7 +16,7 @@ export default function MiListaPage() {
   const [series, setSeries] = useState<ISerie[]>([]);
   const [conjunto, setConjunto] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState<'todos' | 'peliculas' | 'series'>('todos');
+  const [filtro, setFiltro] = useState<'todos' | 'peliculas' | 'series'>('todos'); 
 
   useEffect(() => {
     const user = localStorage.getItem('usuario');
@@ -125,8 +125,7 @@ export default function MiListaPage() {
       console.error('Error al borrar de la lista:', error);
     }
   }
-
-
+ 
   const itemsFiltrados =
     filtro === 'todos'
       ? conjunto
@@ -159,7 +158,7 @@ export default function MiListaPage() {
             </div>
           </div>
         </div>
-
+        
         <div className="row mb-4">
           <div className="col-md-6">
             <div className="d-flex gap-2 flex-wrap">
@@ -184,7 +183,7 @@ export default function MiListaPage() {
             </div>
           </div>
         </div>
-
+      
         <div className="row g-4 mb-5">
           {loading
             ? Array.from({ length: lista.length || 8 }).map((_, i) => (
