@@ -11,38 +11,12 @@ import { IPelicula } from '@/app/interfaces/IPeliculas';
 export default function Header() {
 
   const [usuarioLocal, setUsuarioLocal] = useState<string | null>(null);
-  const [serieReciente, setSerieReciente] = useState<ISerie | null>(null);
-  const [peliculaReciente, setPeliculaReciente] = useState<IPelicula | null>(null);
-
-  const pathname = usePathname();
- 
+  
   useEffect(() => {
     const usuario = localStorage.getItem('usuario');
     setUsuarioLocal(usuario);
   }, []);
 
-  // Llamar a las APIs de alerta
-  useEffect(() => {
-    async function fetchAlertas() {
-      try {
-        const respPelis = await restServicePagina.alertaPelis();
-        const respSeries = await restServicePagina.alertaSeries();
-
-        // Guardamos solo la primera película y serie más reciente
-        if (respPelis.results && respPelis.results.length > 0) {
-          setPeliculaReciente(respPelis.results[0]);
-        }
-        if (respSeries.results && respSeries.results.length > 0) {
-          setSerieReciente(respSeries.results[0]);
-        }
-
-      } catch (error) {
-        console.error('Error al obtener las alertas:', error);
-      }
-    }
-
-    fetchAlertas();
-  }, []);
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top">

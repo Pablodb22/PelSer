@@ -238,19 +238,13 @@ export default function IndividualPage() {
                             )}
 
                             {/* Botones de acción */}
-                            <div className="d-flex gap-3 mb-5 flex-wrap">
-                                <button className="btn btn-light btn-lg rounded-pill px-5 shadow-lg">
-                                    <i className="bi bi-play-fill me-2 fs-5"></i>Reproducir
-                                </button>
-                                <button className="btn btn-outline-light btn-lg rounded-pill px-5 shadow" onClick={agregarMiLista}>
+                            <div className="d-flex gap-3 mb-5 flex-wrap">  
+                                <button className="btn btn-light btn-lg rounded-pill px-5 shadow-lg" onClick={agregarMiLista}>
                                     <i className="bi bi-plus-lg me-2"></i>Mi Lista
                                 </button>
                                 <button className="btn btn-outline-light btn-lg rounded-circle shadow" style={{ width: '60px', height: '60px' }}>
                                     <i className="bi bi-heart fs-5"></i>
-                                </button>
-                                <button className="btn btn-outline-light btn-lg rounded-circle shadow" style={{ width: '60px', height: '60px' }}>
-                                    <i className="bi bi-share fs-5"></i>
-                                </button>
+                                </button>                                
                             </div>
 
                             {/* Descripción */}
