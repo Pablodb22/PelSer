@@ -4,15 +4,44 @@ import Link from 'next/link';
 import { Navbar, Nav, Container, NavDropdown, Badge, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
+import * as restServicePagina from '../../../servicios/pagina';
+import { ISerie } from '@/app/interfaces/ISeries';
+import { IPelicula } from '@/app/interfaces/IPeliculas';
 
 export default function Header() {
-  //const pathname = usePathname();
+
   const [usuarioLocal, setUsuarioLocal] = useState<string | null>(null);
-  //const isActive = (path: string) => pathname === path;
-  
+  const [serieReciente, setSerieReciente] = useState<ISerie | null>(null);
+  const [peliculaReciente, setPeliculaReciente] = useState<IPelicula | null>(null);
+
+  const pathname = usePathname();
+ 
   useEffect(() => {
     const usuario = localStorage.getItem('usuario');
     setUsuarioLocal(usuario);
+  }, []);
+
+  // Llamar a las APIs de alerta
+  useEffect(() => {
+    async function fetchAlertas() {
+      try {
+        const respPelis = await restServicePagina.alertaPelis();
+        const respSeries = await restServicePagina.alertaSeries();
+
+        // Guardamos solo la primera película y serie más reciente
+        if (respPelis.results && respPelis.results.length > 0) {
+          setPeliculaReciente(respPelis.results[0]);
+        }
+        if (respSeries.results && respSeries.results.length > 0) {
+          setSerieReciente(respSeries.results[0]);
+        }
+
+      } catch (error) {
+        console.error('Error al obtener las alertas:', error);
+      }
+    }
+
+    fetchAlertas();
   }, []);
 
   return (
@@ -38,25 +67,6 @@ export default function Header() {
 
           <div className="d-flex align-items-center">
             {/* Dropdown de notificaciones */}
-            <NavDropdown
-              title={
-                <span className="position-relative">
-                  <i className="bi bi-bell fs-5 text-white"></i>
-                  <Badge bg="danger" pill className="position-absolute top-0 start-100 translate-middle">
-                    3
-                  </Badge>
-                </span>
-              }
-              align="end"
-              menuVariant="dark"
-            >
-              <NavDropdown.Header>Notificaciones</NavDropdown.Header>
-              <NavDropdown.Item>🎬 Nueva película agregada</NavDropdown.Item>
-              <NavDropdown.Item>📺 Nueva serie disponible</NavDropdown.Item>
-              <NavDropdown.Item>❤️ Tu lista tiene 12 elementos</NavDropdown.Item>
-            </NavDropdown>
-
-            {/* Perfil */}
             {usuarioLocal ? (
               <Button
                 href="/componentes/configuracion"

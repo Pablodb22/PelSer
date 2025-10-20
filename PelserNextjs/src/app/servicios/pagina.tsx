@@ -165,3 +165,27 @@ export async function borrarListaUsuario(id_usuario:number,id:number){
     const datos=await respuesta.json();
     return datos ;
 }
+
+export async function alertaPelis(){
+    const respuesta=await fetch('https://api.themoviedb.org/3/discover/movie?sort_by=primary_release_date.desc&language=es-US&page=1',{
+        method:'GET',
+        headers:{
+            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
+            'accept':'application/json'
+        }
+    });
+    const datos=await respuesta.json(); 
+    return datos;
+}
+
+export async function alertaSeries(){
+    const respuesta=await fetch('https://api.themoviedb.org/3/discover/tv?sort_by=first_air_date.desc&language=es-US&page=1',{
+        method:'GET',
+        headers:{
+            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
+            'accept':'application/json'
+        }   
+    });
+    const datos=await respuesta.json(); 
+    return datos;
+}

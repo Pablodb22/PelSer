@@ -75,7 +75,7 @@ export default function IndividualPage() {
         }
     
         try {
-          const respuesta = await restServicePagina.agregarPeliculaLista(user.id,0, serie.id);
+          const respuesta = await restServicePagina.agregarSerieLista(user.id,0, serie.id);
           if(respuesta.ok){
             alert('Serie agregada a Mi Lista');
           }   
