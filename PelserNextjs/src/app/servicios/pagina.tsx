@@ -166,26 +166,62 @@ export async function borrarListaUsuario(id_usuario:number,id:number){
     return datos ;
 }
 
-export async function alertaPelis(){
-    const respuesta=await fetch('https://api.themoviedb.org/3/discover/movie?sort_by=primary_release_date.desc&language=es-US&page=1',{
-        method:'GET',
+export async function agregarCalificacionPelicula(id_usuario:number, id_pelicula:number, id_serie:number, favorito:number){
+    const respuesta=await fetch(`${window.location.origin}/api/favoritos/crear`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_pelicula, id_serie, favorito}),
         headers:{
-            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
-            'accept':'application/json'
+            'Content-Type':'application/json'
         }
     });
-    const datos=await respuesta.json(); 
-    return datos;
+    const datos=await respuesta.json();
+    return datos ;
+}
+ 
+export async function agregarCalificacionSerie(id_usuario:number, id_pelicula:number, id_serie:number, favorito:number){
+    const respuesta=await fetch(`${window.location.origin}/api/favoritos/crear`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_pelicula, id_serie, favorito}),
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
 }
 
-export async function alertaSeries(){
-    const respuesta=await fetch('https://api.themoviedb.org/3/discover/tv?sort_by=first_air_date.desc&language=es-US&page=1',{
-        method:'GET',
+export async function obtenerSerieFavorito(id_usuario:number, id_serie:number,id_pelicula:number){
+    const respuesta=await fetch(`${window.location.origin}/api/favoritos/buscar`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_serie,id_pelicula}),
         headers:{
-            'Authorization':`Bearer ${process.env.NEXT_PUBLIC_TOKEN_ACCESO_LECTURA ?? ''}`,
-            'accept':'application/json'
-        }   
+            'Content-Type':'application/json'
+        }
     });
-    const datos=await respuesta.json(); 
-    return datos;
+    const datos=await respuesta.json();
+    return datos ;
+}
+
+export async function obtenerPeliculaFavorito(id_usuario:number, id_serie:number,id_pelicula:number){
+    const respuesta=await fetch(`${window.location.origin}/api/favoritos/buscar`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_serie,id_pelicula}),
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
+}
+
+export async function borrarSerieFavorito(id_usuario:number, id_pelicula:number, id_serie:number){
+    const respuesta=await fetch(`${window.location.origin}/api/favoritos/borrar`,{
+        method:'POST',
+        body: JSON.stringify({id_usuario, id_pelicula, id_serie}),
+        headers:{
+            'Content-Type':'application/json'
+        }
+    });
+    const datos=await respuesta.json();
+    return datos ;
 }

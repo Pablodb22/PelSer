@@ -22,13 +22,47 @@ export default function IndividualPage() {
   const [loading, setLoading] = useState(true);
   const [seriesparecidas, setSeriesParecidas] = useState<ISerie[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
 
-    useEffect(() => {
+  // nuevo estado para controlar si ya está en favoritos y el id del registro en la DB
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteRecordId, setFavoriteRecordId] = useState<number | null>(null);
+
+  useEffect(() => {
     const usuario = localStorage.getItem('usuario');
     if (usuario) {
       setUser(JSON.parse(usuario));
     }
-    }, []);
+  }, []);
+
+  // cuando cambie user o id, consulto si ya está en favoritos y traigo puntuación
+  useEffect(() => {
+    async function obtenerFavorito(){      
+      try{        
+        if (!user || !id) return;
+        const resp = await restServicePagina.obtenerSerieFavorito(user.id, Number(id), 0);
+        if(resp?.ok && resp.data){
+          // supongo que el campo se llama 'favorito' en la fila
+          const fav = resp.data;
+          setIsFavorited(true);
+          setFavoriteRecordId(fav.id ?? null);
+          if (typeof fav.favorito === 'number') {
+            setRating(fav.favorito);
+          }
+        }else{
+          setIsFavorited(false);
+          setFavoriteRecordId(null);
+          setRating(0);
+        }
+      }catch(err){
+        console.error('Error al obtener el favorito:', err);
+      }    
+    }
+  
+    obtenerFavorito();
+  }, [user, id]);
 
   useEffect(() => {
     const fetchSerie = async () => {
@@ -86,6 +120,85 @@ export default function IndividualPage() {
           console.error('Error al agregar a Mi Lista:', error);
         }
       }
+
+  const handleOpenModal = () => {
+    if (!user) {
+        router.push('/componentes/login');
+        return;
+    }
+    // si ya está en favoritos, rating ya se estableció en el useEffect; simplemente mostrar modal para editar
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setHoverRating(0);
+    // no resetear rating para que la puntuación existente se mantenga hasta cancelar
+  };
+
+  const handleSubmitRating = async () => {
+    if (!user) {
+      router.push('/componentes/login');
+      return;
+    }
+
+    if (rating === 0) {
+        alert('Por favor selecciona una calificación');
+        return;
+    }
+
+    try {
+        // crear o actualizar favorito en backend (ruta crear hace upsert)
+        const resp=await restServicePagina.agregarCalificacionSerie(user!.id, 0, serie!.id, rating);   
+        if(resp.ok){
+          alert(`Has calificado esta serie con ${rating} estrellas`);
+          setIsFavorited(true);
+          // si backend devuelve registro, actualizamos favoriteRecordId
+          if (resp.data) {
+            // resp.data puede ser un objeto o array según implementación; manejar casos comunes
+            const data = Array.isArray(resp.data) ? resp.data[0] : resp.data;
+            if (data?.id) setFavoriteRecordId(data.id);
+          }
+          handleCloseModal();
+        } else {
+          alert(resp.message ?? 'Error al guardar la calificación');
+        }                
+    } catch (error) {
+        console.error('Error al guardar la calificación:', error);
+    }
+  };
+
+  const handleDeleteFavorite = async () => {
+    if (!user) {
+      router.push('/componentes/login');
+      return;
+    }
+    try {
+      const resp = await restServicePagina.borrarSerieFavorito(user.id, 0, serie!.id);
+      if (resp.ok) {
+        alert('Favorito eliminado');
+        setIsFavorited(false);
+        setFavoriteRecordId(null);
+        setRating(0);
+        handleCloseModal();
+      } else {
+        alert(resp.message ?? 'Error al eliminar favorito');
+      }
+    } catch (err) {
+      console.error('Error al borrar favorito:', err);
+    }
+  };
+
+  const handleStarClick = (starIndex: number, isHalf: boolean) => {
+    const value = isHalf ? starIndex - 0.5 : starIndex;
+    setRating(value);
+  };
+
+  const handleStarHover = (starIndex: number, isHalf: boolean) => {
+    const value = isHalf ? starIndex - 0.5 : starIndex;
+    setHoverRating(value);
+  };
+
   if (loading) {
     return (
       <div
@@ -182,7 +295,7 @@ export default function IndividualPage() {
       {/* Contenido principal */}
       <div className="container" style={{ marginTop: '-15vh' }}>
         <div className="row g-4">
-          {/* Poster */}
+          {/* Poster */} 
           <div className="col-lg-4">
             <div className="card bg-dark border-0 rounded-4 shadow-lg overflow-hidden">
               <img
@@ -194,7 +307,7 @@ export default function IndividualPage() {
             </div>
           </div>
 
-          {/* Información */}
+          {/* Información */} 
           <div className="col-lg-8">
             <div className="text-white">
               {/* Badge de tipo */}
@@ -246,8 +359,12 @@ export default function IndividualPage() {
                 <button className="btn btn-light btn-lg rounded-pill px-5 shadow-lg" onClick={agregarMiLista}>
                   <i className="bi bi-plus-lg me-2"></i>Mi Lista
                 </button>
-                <button className="btn btn-outline-light btn-lg rounded-circle shadow" style={{ width: '60px', height: '60px' }}>
-                  <i className="bi bi-heart fs-5"></i>
+                <button 
+                  className={`btn ${isFavorited ? 'btn-warning' : 'btn-outline-light'} btn-lg rounded-circle shadow`} 
+                  style={{ width: '60px', height: '60px' }}
+                  onClick={handleOpenModal}
+                >
+                  <i className={`bi ${isFavorited ? 'bi-heart-fill' : 'bi-heart'} fs-5`}></i>
                 </button>               
               </div>
 
@@ -260,9 +377,7 @@ export default function IndividualPage() {
                 <p className="lead text-light">
                   {serie.overview || 'No hay descripción disponible para esta película.'}
                 </p>
-
               </div>
-
 
               {/* Información adicional */}
               <div className="row g-3">
@@ -288,7 +403,6 @@ export default function IndividualPage() {
                       <div>
                         <small className="text-warning d-block fw-semibold">Estreno</small>
                         <h5 className="mb-0 text-light fw-bold">{serie.first_air_date}</h5>
-
                       </div>
                     </div>
                   </div>
@@ -311,7 +425,7 @@ export default function IndividualPage() {
                 <div
                   key={serieSim.id}
                   className="col-6 col-md-4 col-lg-2"
-                  style={{ minWidth: '200px' }}
+                  style={{ minWidth: '200px', cursor: 'pointer' }}
                   onClick={() => router.push(`/componentes/individualSerie/${serieSim.id}`)}
                 >
                   <div
@@ -349,6 +463,161 @@ export default function IndividualPage() {
         </div>
 
       </div>
+
+      {/* Modal de Calificación */}
+      {showModal && (
+        <div 
+          className="modal fade show d-block" 
+          tabIndex={-1} 
+          style={{ 
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            paddingTop: '5vh'
+          }}
+          onClick={handleCloseModal}
+        >
+          <div 
+            className="modal-dialog"
+            style={{ margin: '0 auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content bg-dark text-white border-0 rounded-4 shadow-lg">
+              <div className="modal-header border-secondary">
+                <h5 className="modal-title">
+                  <i className="bi bi-heart-fill text-danger me-2"></i>
+                  {isFavorited ? 'Modificar calificación' : 'Califica esta serie'}
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close btn-close-white" 
+                  onClick={handleCloseModal}
+                ></button>
+              </div>
+              <div className="modal-body text-center py-5">
+                <h4 className="mb-4">{serie.name}</h4>
+                <p className="text-muted mb-4">¿Qué te pareció esta serie?</p>
+                
+                {/* Estrellas con medias estrellas */}
+                <div className="d-flex justify-content-center gap-1 mb-4">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => {
+                    const currentRating = hoverRating || rating;
+                    const isFull = star <= currentRating;
+                    const isHalf = star - 0.5 === currentRating;
+                    
+                    return (
+                      <div 
+                        key={star} 
+                        style={{ 
+                          position: 'relative', 
+                          display: 'inline-block',
+                          cursor: 'pointer'
+                        }}
+                        onMouseLeave={() => setHoverRating(0)}
+                      >
+                        {/* Estrella base (vacía o llena) */}
+                        <i
+                          className={`bi ${isFull || isHalf ? 'bi-star-fill' : 'bi-star'} fs-3`}
+                          style={{
+                            color: isFull || isHalf ? '#ffc107' : '#6c757d',
+                            transition: 'all 0.2s ease'
+                          }}
+                        ></i>
+                        
+                        {/* Área clickeable para media estrella (izquierda) */}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '50%',
+                            height: '100%',
+                            zIndex: 2
+                          }}
+                          onClick={() => handleStarClick(star, true)}
+                          onMouseEnter={() => handleStarHover(star, true)}
+                        ></div>
+                        
+                        {/* Área clickeable para estrella completa (derecha) */}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            width: '50%',
+                            height: '100%',
+                            zIndex: 2
+                          }}
+                          onClick={() => handleStarClick(star, false)}
+                          onMouseEnter={() => handleStarHover(star, false)}
+                        ></div>
+
+                        {/* Overlay para media estrella visual */}
+                        {isHalf && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              width: '50%',
+                              height: '100%',
+                              overflow: 'hidden',
+                              zIndex: 1
+                            }}
+                          >
+                            <i
+                              className="bi bi-star-fill fs-3"
+                              style={{
+                                color: '#ffc107',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0
+                              }}
+                            ></i>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {rating > 0 && (
+                  <div className="alert alert-warning rounded-pill">
+                    <strong>{rating}</strong> {rating === 1 ? 'estrella' : 'estrellas'}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer border-secondary">
+                <button 
+                  type="button" 
+                  className="btn btn-outline-secondary rounded-pill px-4"
+                  onClick={handleCloseModal}
+                >
+                  Cancelar
+                </button>
+                {isFavorited && (
+                  <button 
+                    type="button" 
+                    className="btn btn-danger rounded-pill px-4 me-auto"
+                    onClick={handleDeleteFavorite}
+                  >
+                    <i className="bi bi-trash me-2"></i>Eliminar
+                  </button>
+                )}
+                <button 
+                  type="button" 
+                  className="btn btn-warning rounded-pill px-4"
+                  onClick={handleSubmitRating}
+                  disabled={rating === 0}
+                >
+                  <i className="bi bi-check-lg me-2"></i>
+                  Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
